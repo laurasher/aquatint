@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>SVG Crowbar</title>
+  <link rel="stylesheet" type="text/css" href="assets/linked.css">
+  <style>
+
+    svg {
+      border: solid 1px #ddd;
+    }
+
+    .internal {
+      fill: #f0f;
+    }
+
+    #svgs .dependency {
+      fill: #f0f;
+    }
+
+    /* Page Styles */
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial;
+      width: 600px;
+      margin: 40px auto;
+      font-size: 15px;
+      line-height: 1.4em;
+    }
+
+    #svgs {
+      margin: 20px 0;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="svgs"></div>
+  <input id="dl"
+      name="downloadButton"
+      type="button"
+      value="Download SVG"/>
+
+  <script src="http://d3js.org/d3.v5.min.js"></script>
+  <script src="assets/d3-save-svg.min.js"></script>
+  <script type="text/javascript">
+    var width = 600,
+        height = 600;
+
+    var svgNode;
+
+    var svg = d3.select("#svgs").append("svg")
+       .attr("width", width)
+       .attr("height", height);
+
+    d3.xml("assets/glyph_dictionary/6c.svg")
+      .then(data => {
+          d3.select('svg')
+          .append("g")
+          .attr("transform", "scale(0.4)")
+          .node().append(data.documentElement)
+      })
+
+    d3.xml("assets/glyph_dictionary/8c.svg")
+      .then(data => {
+          d3.select('svg').node().append(data.documentElement)
+      })
+
+    d3.xml("assets/glyph_dictionary/c2.svg")
+      .then(data => {
+        let _d = data
+          d3.select('svg').node().append(data.documentElement)
+      })
+    
+    d3.select('#dl').on('click', function() {
+      var config = {
+        filename: 'customFileName',
+      }
+      // d3_save_svg.save(svgNode, config);
+      d3_save_svg.save(d3.select('svg').node(), config);
+    });
+
+  </script>
+
+</body>

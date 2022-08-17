@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>SVG Crowbar</title>
+  <link rel="stylesheet" type="text/css" href="assets/linked.css">
+  <style>
+
+    svg {
+        border: solid 1px #ddd;
+    }
+
+    .internal {
+      fill: #f0f;
+    }
+
+    #svgs .dependency {
+      fill: #f0f;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="svgs"></div>
+  <input id="dl"
+      name="downloadButton"
+      type="button"
+      value="Download SVG"/>
+
+  <script src="http://d3js.org/d3.v5.min.js"></script>
+  <script src="assets/d3-save-svg.min.js"></script>
+  <script type="text/javascript">
+
+    var svgNode;
+
+    var svg = d3.select("#svgs").append("svg")
+       .attr("width", 600)
+       .attr("height", 600);
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    d3.select('#dl').on('click', function() {
+      var config = {
+        filename: 'customFileName',
+      }
+      // d3_save_svg.save(svgNode, config);
+      d3_save_svg.save(d3.select('svg').node(), config);
+    });
+
+    function row(d) {
+        return {
+            x_val: +d.x_val,
+            y_val: +d.y_val,
+            data_channel: d.data_channel,
+        };
+    }
+
+    function getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    function getRandomInt(min, max) {
+        return parseInt(Math.random() * (max - min) + min);
+    }
+    
+    function plot(data_file, image_file) {
+        // CSV columns are <data_channel>,	<x_val>,	<y_val>
+        d3.csv(data_file, row).then(csv_data => {
+            console.log(data_file)
+
+            // Scale the data
+            x_min = Math.min.apply(Math, csv_data.map(x => x.x_val));
+            x_max = Math.max.apply(Math, csv_data.map(x => x.x_val));
+            y_min = Math.min.apply(Math, csv_data.map(x => x.y_val));
+            y_max = Math.max.apply(Math, csv_data.map(x => x.y_val));
+            let n = csv_data.length
+
+            // Programmatically load svgs
+            let left_shift = 0;
+            let top_shift = 0;
+
+            d3.xml(image_file)
+                .then(xml_data => {
+                    let glyph_h_w = getRandomArbitrary(20, 30);
+                    // let size_scale = 1.9 //scale of overall composition
+                    let size_scale = 0.2; //scale of overall composition
+                    let translate_scale = 0.3; //higher is closer together
+                    let rot_scale = 3;
+
+                    d3.select('svg')
+                        .data(csv_data)
+                        .append("g")
+                        .attr("width", glyph_h_w)
+                            .attr("height", glyph_h_w)
+                            .style("fill", "none")
+                            .attr("transform", function (d) {
+                                // return "scale(" + size_scale + ") translate(" + (left_shift+d.x_val/translate_scale) + "," + (top_shift+d.y_val/translate_scale) +") rotate("+ d.data_channel*rot_scale+")"
+                                return "scale(" + size_scale + ") translate(" + (left_shift+d.x_val/translate_scale) + "," + (top_shift+d.y_val/translate_scale) +")"
+                            })
+                            // .attr("transform", "translate(0, 0)")
+                            .on("mouseover", function(d) {
+                                console.log("FILE: "+image_file+"\n")
+                            })
+                            .node().append(xml_data.documentElement)
+                })
+        });
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    let base_file = "sample_1"
+    let base_file_2 = "sample_2"
+
+    for (let i of [...Array(19).keys()]){
+        plot('assets/csv/drawn_marks/'+base_file+'_'+i+'.csv', 'assets/glyph_dictionary_lines/'+getRandomInt(1, 74)+'.svg');
+        plot('assets/csv/drawn_marks/'+base_file_2+'_'+i+'.csv', 'assets/glyph_dictionary_lines/'+getRandomInt(1, 74)+'.svg');
+    }
+
+  </script>
+
+</body>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>SVG Crowbar</title>
+  <link rel="stylesheet" type="text/css" href="assets/linked.css">
+  <style>
+
+    svg {
+        border: solid 1px #ddd;
+    }
+
+    .internal {
+      fill: #f0f;
+    }
+
+    #svgs .dependency {
+      fill: #f0f;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="svgs"></div>
+  <input id="dl"
+      name="downloadButton"
+      type="button"
+      value="Download SVG"/>
+
+  <script src="http://d3js.org/d3.v5.min.js"></script>
+  <script src="assets/d3-save-svg.min.js"></script>
+  <script type="text/javascript">
+
+    var svgNode;
+
+    var svg = d3.select("#svgs").append("svg")
+       .attr("width", 1200)
+       .attr("height", 600);
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    d3.select('#dl').on('click', function() {
+      var config = {
+        filename: 'raw_df',
+      }
+      d3_save_svg.save(d3.select('svg').node(), config);
+    });
+
+    function row(d) {
+        // console.log("row");
+        // console.log(d)
+        return {
+            x_val: +d.x_val,
+            y_val: +d.y_val,
+            data_channel: d.data_channel,
+        };
+    }
+
+    function getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    function getRandomInt(min, max) {
+        return parseInt(Math.random() * (max - min) + min);
+    }
+    
+    function plot(data_file, image_file) {
+        // CSV columns are <data_channel>,	<x_val>,	<y_val>
+        d3.csv(data_file, row).then(csv_data => {
+            console.log(csv_data)
+            // Scale the data
+            x_min = Math.min.apply(Math, csv_data.map(x => x.x_val));
+            x_max = Math.max.apply(Math, csv_data.map(x => x.x_val));
+            y_min = Math.min.apply(Math, csv_data.map(x => x.y_val));
+            y_max = Math.max.apply(Math, csv_data.map(x => x.y_val));
+            let n = csv_data.length
+
+            // Programmatically load svgs
+            let left_shift = 0;
+            let top_shift = 0;
+
+            d3.xml(image_file)
+                .then(xml_data => {
+                    let glyph_h_w = 10;
+                    d3.select('svg')
+                        .data(csv_data)
+                        .append("g")
+                        .attr("width", glyph_h_w)
+                            .attr("height", glyph_h_w)
+                            .style("fill", "none")
+                            .attr("transform", function (d) {
+                                // for each sqaure d has x_val and y_val
+                                console.log(d);
+                            })
+                            .node().append(xml_data.documentElement)
+                })
+        });
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    let csv_file = "assets/csv/raw_df/cicada_spectro_raw_df_flattened.csv"
+    plot(csv_file, 'assets/glyph_dictionary_lines/1.svg');
+
+  </script>
+
+</body>

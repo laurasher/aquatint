@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>SVG Crowbar</title>
+  <link rel="stylesheet" type="text/css" href="assets/linked.css">
+  <style>
+
+    svg {
+        border: solid 1px #ddd;
+    }
+
+    .internal {
+      fill: #f0f;
+    }
+
+    #svgs .dependency {
+      fill: #f0f;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="svgs"></div>
+  <input id="dl"
+      name="downloadButton"
+      type="button"
+      value="Download SVG"/>
+
+  <script src="http://d3js.org/d3.v5.min.js"></script>
+  <script src="assets/d3-save-svg.min.js"></script>
+  <script type="text/javascript">
+
+    var svgNode;
+
+    var svg = d3.select("#svgs").append("svg")
+       .attr("width", 600)
+       .attr("height", 600);
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    d3.select('#dl').on('click', function() {
+      var config = {
+        filename: 'customFileName',
+      }
+      // d3_save_svg.save(svgNode, config);
+      d3_save_svg.save(d3.select('svg').node(), config);
+    });
+
+    function row(d) {
+        return {
+            x_val: +d.x_val,
+            y_val: +d.y_val,
+            data_channel: d.data_channel,
+        };
+    }
+
+    function getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+    
+    function plot(data_file, image_file) {
+        // CSV columns are <data_channel>,	<x_val>,	<y_val>
+        d3.csv(data_file, row).then(csv_data => {
+            console.log(data_file)
+
+            // Scale the data
+            x_min = Math.min.apply(Math, csv_data.map(x => x.x_val));
+            x_max = Math.max.apply(Math, csv_data.map(x => x.x_val));
+            y_min = Math.min.apply(Math, csv_data.map(x => x.y_val));
+            y_max = Math.max.apply(Math, csv_data.map(x => x.y_val));
+            let n = csv_data.length
+
+            // Programmatically load svgs
+            let left_shift = 1500;
+            let top_shift = 1500;
+
+            d3.xml(image_file)
+                .then(xml_data => {
+                    let glyph_h_w = getRandomArbitrary(20, 30)
+                    // let size_scale = 1.9 //scale of overall composition
+                    let size_scale = 0.2 //scale of overall composition
+                    let translate_scale = 2 //higher is closer together
+                    let rot_scale = 3
+
+                    d3.select('svg')
+                        .data(csv_data)
+                        .append("g")
+                        .attr("width", glyph_h_w)
+                            .attr("height", glyph_h_w)
+                            .style("fill", "none")
+                            .attr("transform", function (d) {
+                                return "scale(" + size_scale + ") translate(" + (left_shift+d.x_val/translate_scale) + "," + (top_shift+d.y_val/translate_scale) +") rotate("+ d.data_channel*rot_scale+")"
+                            })
+                            .on("mouseover", function(d) {
+                                console.log("FILE: "+image_file+"\n")
+                            })
+                            .node().append(xml_data.documentElement)
+                })
+        });
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    let base_file = "sample_1"
+    let base_file_2 = "sample_2"
+
+    plot('assets/csv/drawn_marks/'+base_file+'_0.csv',      'assets/shape_elements/a4.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_1.csv',      'assets/shape_elements/a6.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_2.csv',      'assets/shape_elements/a7.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_3.csv',      'assets/shape_elements/e6.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_4.csv',      'assets/shape_elements/e7.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_5.csv',      'assets/shape_elements/e3.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_6.csv',      'assets/shape_elements/e1.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_7.csv',      'assets/shape_elements/c2.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_8.csv',      'assets/shape_elements/d1.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_9.csv',      'assets/shape_elements/d2.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_10.csv',     'assets/shape_elements/d3.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_11.csv',     'assets/shape_elements/e7.svg')
+    plot('assets/csv/drawn_marks/'+base_file+'_12.csv',     'assets/shape_elements/d5.svg')
+    plot('assets/csv/drawn_marks/'+base_file_2+'_13.csv',   'assets/shape_elements/e1.svg')
+    plot('assets/csv/drawn_marks/'+base_file_2+'_14.csv',   'assets/shape_elements/e2.svg')
+    plot('assets/csv/drawn_marks/'+base_file_2+'_15.csv',   'assets/shape_elements/e3.svg')
+    plot('assets/csv/drawn_marks/'+base_file_2+'_16.csv',   'assets/shape_elements/e4.svg')
+    plot('assets/csv/drawn_marks/'+base_file_2+'_17.csv',   'assets/shape_elements/e5.svg')
+    plot('assets/csv/drawn_marks/'+base_file_2+'_18.csv',   'assets/shape_elements/e6.svg')
+  </script>
+
+</body>
