@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
-  <title>SVG Crowbar</title>
+  <title>Aquatint</title>
   <link rel="stylesheet" type="text/css" href="assets/linked.css">
   <style>
 
@@ -32,38 +32,73 @@
       value="Download SVG"/>
 
   <script src="//d3js.org/d3.v3.min.js"></script>
+  <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+  <!-- <script src="http://d3js.org/d3.v5.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
   <script src="assets/d3-save-svg.min.js"></script>
   <script type="text/javascript">
 
-// for each pixel
 var width = 960,
     height = 500;
-
-var sample = bestCandidateSampler(width, height, 10, 10000); //last argument is number of dots in this area
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-d3.timer(function() {
-  for (var i = 0; i < 10000; ++i) { // middle number is speed of dot entry
-    var s = sample();
-    if (!s) return true;
-    svg.append("circle")
-        .attr("cx", s[0])
-        .attr("cy", s[1])
-        .attr("r", 0)
-      .transition()
-        .attr("r", 2);
-  }
-});
+
+function aquatint(data_file) {
+    // CSV columns are <data_channel>,	<x_val>,	<y_val>
+    var x_translate = 0;
+    var y_translate = 0;
+
+    // d3.csv(data_file, row).then(csv_data => {
+    d3.csv(data_file, function(csv_data) {
+        console.log("-- csv_data")
+        console.log(csv_data)
+        
+        var pixelWidth = width/_.uniq(csv_data.map(e => e.x_val)).length;
+        var pixelHeight = height/_.uniq(csv_data.map(e => e.y_val)).length;
+
+        console.log("-- pixelWidth", pixelWidth);
+        console.log("-- pixelHeight", pixelHeight);
+
+        drawPatch(svg, 500, x_translate, y_translate);
+        x_translate = x_translate + pixelWidth;
+        y_translate = y_translate + pixelHeight;
+
+        // for (let _d of csv_data){
+        //     drawPatch(svg, +_d["data_channel"], x_translate, y_translate);
+        //     x_translate = x_translate + pixelWidth;
+        //     y_translate = y_translate + pixelHeight;
+        // }
+    });
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function drawPatch(_svg, n_dots, x_shift, y_shift){
+    var sample = bestCandidateSampler(width, height, 10, n_dots); //last argument is number of dots in this area
+    console.log("-- drawPatch n_dots:", n_dots);
+    d3.timer(function() {
+        for (var i = 0; i < 10000; ++i) { // middle number is speed of dot entry
+            var s = sample();
+            if (!s) return true;
+            _svg.append("circle")
+                .attr("cx", s[0])
+                .attr("cy", s[1])
+                .attr("r", 0)
+            .transition()
+                .attr("r", 2)
+            // .transform("traslate", "translate "+x_shift+","+y_shift+")");
+        }
+    });
+}
 
 function bestCandidateSampler(width, height, numCandidates, numSamplesMax) {
   var numSamples = 0;
 
   var quadtree = d3.geom.quadtree()
       .extent([[0, 0], [width, height]])
-      ([[Math.random() * width, Math.random() * height]]);
+      ([[Math.random() * width, Math.random() * height]])
 
   return function() {
     if (++numSamples > numSamplesMax) return;
@@ -132,6 +167,14 @@ function bestCandidateSampler(width, height, numCandidates, numSamplesMax) {
   }
 }
 
+function row(d) {
+        return {
+            x_val: +d.x_val,
+            y_val: +d.y_val,
+            data_channel: d.data_channel,
+        };
+    }
+
 d3.select('#dl').on('click', function() {
       var config = {
         filename: 'aquatint',
@@ -139,6 +182,13 @@ d3.select('#dl').on('click', function() {
       // d3_save_svg.save(svgNode, config);
       d3_save_svg.save(d3.select('svg').node(), config);
     });
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+let csv_file = "assets/csv/raw_df/cicada_spectro_raw_df_flattened.csv"
+aquatint(csv_file);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 </script>
 
