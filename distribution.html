@@ -58,29 +58,23 @@ function aquatint(data_file) {
     d3.csv(data_file, function(csv_data) {
         console.log("-- csv_data")
         console.log(csv_data)
-        console.log(csv_data.slice(0, 10))
         
-        var pixelWidth =   60*(width/(_.uniq(csv_data.map(e => e.x_val)).length));
-        var pixelHeight =  60*(height/(_.uniq(csv_data.map(e => e.y_val)).length));
+        var pixelWidth =   (width/(_.uniq(csv_data.map(e => e.x_val)).length));
+        var pixelHeight =  (height/(_.uniq(csv_data.map(e => e.y_val)).length));
 
         console.log("-- pixelWidth", pixelWidth);
         console.log("-- pixelHeight", pixelHeight);
 
-        // drawPatch(svg, 500, x_translate, y_translate, 100, 100);
-        // x_translate = x_translate + pixelWidth;
-        // y_translate = y_translate + pixelHeight;
-        // drawPatch(svg, 500, (x_translate+100), y_translate, 100, 100);
-
-        let test_len = 10;
-
-        for (let _d of csv_data.slice(591000, 591000+test_len)){
-            // pixelWidth = 10;
-            // pixelHeight = 10;
-            // let _data_channel = 10;
-            drawPatch(svg, +_d["data_channel"], x_translate, y_translate, pixelWidth, pixelHeight);
+        // let test_len = 10;
+        // for (let _d of csv_data.slice(591000, 591000+test_len)){
+        for (let _d of csv_data){
+            pixelWidth = 10;
+            pixelHeight = 10;
+            // let _data_channel = _d["data_channel"];
             // drawPatch(svg, _data_channel, x_translate, y_translate, pixelWidth, pixelHeight);
-            x_translate = x_translate + pixelWidth;
-            y_translate = y_translate + pixelHeight;
+            // x_translate = x_translate + pixelWidth;
+            // y_translate = y_translate + pixelHeight;
+            drawPatch(svg, _d["data_channel"], _d["y_val"],  _d["x_val"], pixelWidth, pixelHeight);
         }
     });
 }
@@ -89,7 +83,8 @@ function aquatint(data_file) {
 function drawPatch(_svg, n_dots, x_shift, y_shift, pixel_height, pixel_width){
 
     var sample = bestCandidateSampler(pixel_width, pixel_height, 10, n_dots); //last argument is number of dots in this area
-    console.log("-- drawPatch n_dots:", n_dots);
+    n_dots = parseInt(n_dots);
+    // console.log("-- drawPatch n_dots:", n_dots);
     d3.timer(function() {
         for (var i = 0; i < 10000; ++i) { // middle number is speed of dot entry
             var s = sample();
@@ -198,7 +193,8 @@ d3.select('#dl').on('click', function() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-let csv_file = "assets/csv/raw_df/cicada_spectro_raw_df_flattened.csv"
+// let csv_file = "assets/csv/raw_df/cicada_spectro_raw_df_flattened.csv"
+let csv_file = "assets/csv/raw_df/cicada_flattened_sample_rate_0p001.csv"
 aquatint(csv_file);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
