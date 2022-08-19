@@ -62,7 +62,7 @@ function aquatint(data_file) {
         console.log("-- pixelWidth", pixelWidth);
         console.log("-- pixelHeight", pixelHeight);
 
-        drawPatch(svg, 500, x_translate, y_translate);
+        drawPatch(svg, 500, x_translate, y_translate, 100, 100);
         x_translate = x_translate + pixelWidth;
         y_translate = y_translate + pixelHeight;
 
@@ -75,8 +75,10 @@ function aquatint(data_file) {
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function drawPatch(_svg, n_dots, x_shift, y_shift){
-    var sample = bestCandidateSampler(width, height, 10, n_dots); //last argument is number of dots in this area
+function drawPatch(_svg, n_dots, x_shift, y_shift, pixel_height, pixel_width){
+
+    var sample = bestCandidateSampler(pixel_width, pixel_height, 10, n_dots); //last argument is number of dots in this area
+
     console.log("-- drawPatch n_dots:", n_dots);
     d3.timer(function() {
         for (var i = 0; i < 10000; ++i) { // middle number is speed of dot entry
