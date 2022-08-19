@@ -65,6 +65,7 @@ function aquatint(data_file) {
         drawPatch(svg, 500, x_translate, y_translate, 100, 100);
         x_translate = x_translate + pixelWidth;
         y_translate = y_translate + pixelHeight;
+        drawPatch(svg, 500, (x_translate+100), y_translate, 100, 100);
 
         // for (let _d of csv_data){
         //     drawPatch(svg, +_d["data_channel"], x_translate, y_translate);
@@ -84,13 +85,14 @@ function drawPatch(_svg, n_dots, x_shift, y_shift, pixel_height, pixel_width){
         for (var i = 0; i < 10000; ++i) { // middle number is speed of dot entry
             var s = sample();
             if (!s) return true;
-            _svg.append("circle")
+            _svg
+            .append("circle")
                 .attr("cx", s[0])
                 .attr("cy", s[1])
                 .attr("r", 0)
             .transition()
-                .attr("r", 2)
-            // .transform("traslate", "translate "+x_shift+","+y_shift+")");
+                .attr("r", 0.5)
+            .attr("transform", "translate("+x_shift+","+y_shift+")")
         }
     });
 }
