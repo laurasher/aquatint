@@ -38,8 +38,11 @@
   <script src="assets/d3-save-svg.min.js"></script>
   <script type="text/javascript">
 
-var width = 960,
-    height = 500;
+// var width = 960,
+//     height = 500;
+var dot_radius = 0.5;
+var width = 1300,
+    height = 700;
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -55,23 +58,30 @@ function aquatint(data_file) {
     d3.csv(data_file, function(csv_data) {
         console.log("-- csv_data")
         console.log(csv_data)
+        console.log(csv_data.slice(0, 10))
         
-        var pixelWidth = width/_.uniq(csv_data.map(e => e.x_val)).length;
-        var pixelHeight = height/_.uniq(csv_data.map(e => e.y_val)).length;
+        var pixelWidth =   60*(width/(_.uniq(csv_data.map(e => e.x_val)).length));
+        var pixelHeight =  60*(height/(_.uniq(csv_data.map(e => e.y_val)).length));
 
         console.log("-- pixelWidth", pixelWidth);
         console.log("-- pixelHeight", pixelHeight);
 
-        drawPatch(svg, 500, x_translate, y_translate, 100, 100);
-        x_translate = x_translate + pixelWidth;
-        y_translate = y_translate + pixelHeight;
-        drawPatch(svg, 500, (x_translate+100), y_translate, 100, 100);
+        // drawPatch(svg, 500, x_translate, y_translate, 100, 100);
+        // x_translate = x_translate + pixelWidth;
+        // y_translate = y_translate + pixelHeight;
+        // drawPatch(svg, 500, (x_translate+100), y_translate, 100, 100);
 
-        // for (let _d of csv_data){
-        //     drawPatch(svg, +_d["data_channel"], x_translate, y_translate);
-        //     x_translate = x_translate + pixelWidth;
-        //     y_translate = y_translate + pixelHeight;
-        // }
+        let test_len = 10;
+
+        for (let _d of csv_data.slice(591000, 591000+test_len)){
+            // pixelWidth = 10;
+            // pixelHeight = 10;
+            // let _data_channel = 10;
+            drawPatch(svg, +_d["data_channel"], x_translate, y_translate, pixelWidth, pixelHeight);
+            // drawPatch(svg, _data_channel, x_translate, y_translate, pixelWidth, pixelHeight);
+            x_translate = x_translate + pixelWidth;
+            y_translate = y_translate + pixelHeight;
+        }
     });
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +89,6 @@ function aquatint(data_file) {
 function drawPatch(_svg, n_dots, x_shift, y_shift, pixel_height, pixel_width){
 
     var sample = bestCandidateSampler(pixel_width, pixel_height, 10, n_dots); //last argument is number of dots in this area
-
     console.log("-- drawPatch n_dots:", n_dots);
     d3.timer(function() {
         for (var i = 0; i < 10000; ++i) { // middle number is speed of dot entry
@@ -90,9 +99,9 @@ function drawPatch(_svg, n_dots, x_shift, y_shift, pixel_height, pixel_width){
                 .attr("cx", s[0])
                 .attr("cy", s[1])
                 .attr("r", 0)
-            .transition()
-                .attr("r", 0.5)
-            .attr("transform", "translate("+x_shift+","+y_shift+")")
+            // .transition()
+                .attr("r", dot_radius)
+                .attr("transform", "translate("+x_shift+","+y_shift+")")
         }
     });
 }
@@ -173,9 +182,9 @@ function bestCandidateSampler(width, height, numCandidates, numSamplesMax) {
 
 function row(d) {
         return {
-            x_val: +d.x_val,
-            y_val: +d.y_val,
-            data_channel: d.data_channel,
+            x_val: parseInt(d.x_val),
+            y_val: parseInt(d.y_val),
+            data_channel: parseInt(d.data_channel),
         };
     }
 
