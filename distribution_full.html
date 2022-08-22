@@ -40,7 +40,7 @@
 
 // var width = 960,
 //     height = 500;
-var dot_radius = 0.3;
+var dot_radius = 0.1;
 var width = 1300,
     height = 700;
 
@@ -68,13 +68,13 @@ function aquatint(data_file) {
         // let test_len = 10;
         // for (let _d of csv_data.slice(591000, 591000+test_len)){
         for (let _d of csv_data){
-            pixelWidth =  50;
-            pixelHeight = 50;
+            // pixelWidth =  8;
+            // pixelHeight = 8;
             // let _data_channel = _d["data_channel"];
             // drawPatch(svg, _data_channel, x_translate, y_translate, pixelWidth, pixelHeight);
             // x_translate = x_translate + pixelWidth;
             // y_translate = y_translate + pixelHeight;
-            drawPatch(svg, _d["data_channel"], _d["y_val"],  _d["x_val"], pixelWidth, pixelHeight);
+            drawPatch(svg, _d["data_channel"], _d["y_val"]*pixelHeight,  _d["x_val"]*pixelWidth, pixelWidth, pixelHeight);
         }
     });
 }
@@ -194,7 +194,9 @@ d3.select('#dl').on('click', function() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // let csv_file = "assets/csv/raw_df/cicada_spectro_raw_df_flattened.csv"
-let csv_file = "assets/csv/raw_df/cicada_flattened_sample_rate_0p001.csv"
+// let csv_file = "assets/csv/raw_df/cicada_flattened_sample_rate_0p01.csv"
+// let csv_file = "assets/csv/raw_df/sample_2_crop_crop_cicada_flattened_sample_rate_0p1.csv"
+let csv_file = "assets/csv/raw_df/sample_2_crop_crop_cicada_flattened_sample_rate_0p7.csv"
 aquatint(csv_file);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
