@@ -41,13 +41,18 @@
 // var width = 960,
 //     height = 500;
 var dot_radius = 0.2;
-var width = 700,
-    height = 700;
+// var dot_radius = 0.4;
+
+var width = 500,
+    height = 800;
+// var height = 700,
+//     width = 1000;
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
+var BATCH_N = 1;
 
 function aquatint(data_file) {
     // CSV columns are <data_channel>,	<x_val>,	<y_val>
@@ -59,23 +64,17 @@ function aquatint(data_file) {
         console.log("-- csv_data")
         console.log(csv_data)
         
-        var pixelWidth =   (width/(_.uniq(csv_data.map(e => e.x_val)).length));
-        var pixelHeight =  (height/(_.uniq(csv_data.map(e => e.y_val)).length));
+        // var pixelWidth =   (width/(_.uniq(csv_data.map(e => e.x_val)).length));
+        // var pixelHeight =  (height/(_.uniq(csv_data.map(e => e.y_val)).length));
+
+        var pixelWidth =  6.5;
+        var pixelHeight = 6.5;
 
         console.log("-- pixelWidth", pixelWidth);
         console.log("-- pixelHeight", pixelHeight);
 
-        // let test_len = 10;
-        // for (let _d of csv_data.slice(591000, 591000+test_len)){
         for (let _d of csv_data){
-            // pixelWidth =  8;
-            // pixelHeight = 8;
-            // let _data_channel = _d["data_channel"];
-            // drawPatch(svg, _data_channel, x_translate, y_translate, pixelWidth, pixelHeight);
-            // x_translate = x_translate + pixelWidth;
-            // y_translate = y_translate + pixelHeight;
-            drawPatch(svg, _d["data_channel"]/3, _d["y_val"]*pixelHeight, _d["x_val"]*pixelWidth, pixelWidth, pixelHeight);
-            // drawPatch(svg, _d["data_channel"]/15, _d["y_val"]*pixelHeight, _d["x_val"]*pixelWidth, pixelWidth, pixelHeight);
+            drawPatch(svg, _d["data_channel"]/4, _d["y_val"]*pixelHeight, _d["x_val"]*pixelWidth, pixelWidth, pixelHeight);
         }
     });
 }
@@ -186,18 +185,16 @@ function row(d) {
 
 d3.select('#dl').on('click', function() {
       var config = {
-        filename: 'aquatint',
+        filename: 'aquatint_'+BATCH_N,
       }
-      // d3_save_svg.save(svgNode, config);
       d3_save_svg.save(d3.select('svg').node(), config);
     });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// let csv_file = "assets/csv/raw_df_triptych_split/_triptych_test_1_bottom_flattened.csv"
+// let csv_file = "assets/csv/raw_df_triptych_split/triptych_panel_1_bottom/triptych_panel_1_bottom_flattened_"+BATCH_N+".csv"
+let csv_file = "assets/csv/raw_df_triptych_split/triptych_panel_1_top/triptych_panel_1_top_flattened_"+BATCH_N+".csv"
 
-// let csv_file = "assets/csv/raw_df/cicada_spectro_raw_df_flattened.csv"
-// let csv_file = "assets/csv/raw_df/cicada_flattened_sample_rate_0p01.csv"
-// let csv_file = "assets/csv/raw_df/sample_2_crop_crop_cicada_flattened_sample_rate_0p1.csv"
-let csv_file = "assets/csv/raw_df/sample_2_crop_crop_crop_cicada_flattened_sample_rate_1.csv"
 aquatint(csv_file);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
